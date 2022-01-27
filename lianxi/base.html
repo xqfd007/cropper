@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+
+<head>
+  <meta charset="utf-8">
+  <title>title</title>
+  <script src="./js//jq.main.js"></script>
+  <link rel="stylesheet" href="./js//cropper.css">
+  <script src="./js/cropper.js"></script>
+  <style>
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: "Microsoft YaHei";
+    }
+
+    .wrap-dialog {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      font-size: 16px;
+      text-align: center;
+      background-color: rgba(0, 0, 0, .4);
+      z-index: 999;
+    }
+
+    .dialog {
+      position: relative;
+      margin: 0 auto;
+      margin-top: 12%;
+      margin-left: 34%;
+      width: 380px;
+      /* padding: 5px  5px; */
+      background-color: #FFFFFF;
+    }
+
+    .dialog-header {
+      height: 20px;
+      padding: 10px;
+      background-color: lightskyblue;
+    }
+
+    .dialog-body {
+      width: 380px;
+      height: 240px;
+
+    }
+
+
+
+    .dialog-footer {
+      padding: 8px;
+      background-color: whitesmoke;
+    }
+
+    .btn {
+      width: 70px;
+      padding: 2px;
+    }
+
+    .hide {
+      display: none;
+    }
+
+    .ml50 {
+      margin-left: 50px;
+    }
+  </style>
+</head>
+
+<body>
+  <div>
+    <img id='result' src="./1.jpg" style="width: 160px;height: 240px;"></img>
+  </div>
+  <input type="button" value="更改图片" class="btn ml50" id="remove">
+
+  <div class="wrap-dialog hide">
+    <div class="dialog">
+      <div class="dialog-header">
+        <span class="dialog-title">裁剪图片</span>
+      </div>
+      <div class="dialog-body">
+        <!-- <span class="dialog-message"> -->
+        <img alt="" id="photo">
+        <!-- </span> -->
+      </div>
+      <div class="dialog-footer" style="display: flex; justify-content: space-around;">
+        <input type="file" class="btn" id="input" value="上传" />
+        <input type="button" class="btn" id="confirm" value="确认" />
+        <input type="button" class="btn " id="cancel" value="取消" />
+      </div>
+    </div>
+  </div>
+</body>
+
+<script>
+  $(document).ready(function () {
+
+    $('#remove').click(function () {
+      var message = "你确认删除此条信息？？";
+      dialogBox(message,
+        function () {
+          crop()
+          console.log("confirmed");
+          // do something
+        },
+        function () {
+          console.log("canceled");
+          // do something
+        }
+      );
+    });
+
+  });
+
+  function dialogBox(message, yesCallback, noCallback) {
+    // if (message) {
+    //   $('.dialog-message').html(message);
+    // }
+    // 显示遮罩和对话框
+    $('.wrap-dialog').removeClass("hide");
+    // 确定按钮
+    $('#confirm').click(function () {
+      $('.wrap-dialog').addClass("hide");
+      yesCallback();
+    });
+    // 取消按钮
+    $('#cancel').click(function () {
+      $('.wrap-dialog').addClass("hide");
+      noCallback();
+    });
+  }
+  var crop = function () {
+    var $image = $('#photo');
+    var $target = $('#result');
+
+    $('#result').attr('src', $('#photo').cropper('getCroppedCanvas', {
+      width: 300,
+      height: 300
+    }).toDataURL('image.jpeg'))
+    document.getElementById('')
+
+    $('#photo').cropper('getCroppedCanvas', {
+      width: 180,
+      height: 240
+    }).toDataURL('image.jpeg')
+    console.log($('#photo').cropper('getCroppedCanvas', {
+      width: 180,
+      height: 240
+    }).toDataURL('image.jpeg'))
+    // console.log()
+    // $image.cropper('getCroppedCanvas', {
+    //     width: 150,
+    //     height: 200
+    // }).toBlob(function (blob) {
+    //     console.log(blob)
+    //     $target.attr('src', URL.createObjectURL(blob));
+    // });
+  }
+
+  var initCropper = function (img, input) {
+    var $image = img;
+    var options = {
+      aspectRatio: 12 / 16,
+      viewMode: 2,
+      preview: '.img-preview',
+      minContainerWidth: 0,
+      minContainerHeigth: 200,
+      minCanvasWidth: 0,
+      minCanvasHeight: 180,
+      minCroBoxWidth: 0,
+      minCropBoxHeight: 40
+    };
+    $image.cropper(options);
+    var $inputImage = input;
+    var uploadedImageURL;
+    if (URL) {
+
+      $inputImage.change(function () {
+        var files = this.files;
+        var file;
+        if (!$image.data('cropper')) {
+          return;
+        }
+        if (files && files.length) {
+          file = files[0];
+          if (/^image\/\w+$/.test(file.type)) {
+            if (uploadedImageURL) {
+              URL.revokeObjectURL(uploadedImageURL);
+            }
+            uploadedImageURL = URL.createObjectURL(file);
+            $image.cropper('destroy').attr('src', uploadedImageURL).cropper(options);
+            $inputImage.val('');
+          } else {
+            window.alert('请选择一个图像文件！');
+          }
+        }
+      });
+    } else {
+      $inputImage.prop('disabled', true).addClass('disabled');
+    }
+  }
+
+  $(function () {
+    initCropper($('#photo'), $('#input'));
+  });
+</script>
+
+</html>
